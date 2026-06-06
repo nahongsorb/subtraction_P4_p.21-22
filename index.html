@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>แบบฝึกหัดคณิตศาสตร์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --success: #2ECC71;
+            --success-bg: #E8F8F5;
+            --error: #E74C3C;
+            --error-bg: #FDEDEC;
+            --text-main: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-color: #F4F6F7;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+            padding-bottom: 80px; /* Space for bottom nav */
+            animation: fadeIn 0.4s ease forwards;
+            flex: 1;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1, h2, h3 { color: var(--text-main); margin-bottom: 16px; text-align: center; }
+        .subtitle { color: var(--text-light); text-align: center; margin-bottom: 24px; font-weight: 300; }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 24px;
+        }
+        
+        .name-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 2px solid #E5E8E8;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .name-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Question Items */
+        .question-card {
+            background: #FAFAFA;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid #EEEEEE;
+            transition: all 0.3s ease;
+        }
+
+        .q-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .answer-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .ans-input, .ans-select {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            font-size: 16px;
+            border: 2px solid #E5E8E8;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+            background-color: white;
+            appearance: none;
+        }
+
+        .ans-input.success, .ans-select.success {
+            border-color: var(--success);
+            background-color: var(--success-bg);
+            color: #1E8449;
+        }
+
+        .ans-input.error, .ans-select.error {
+            border-color: var(--error);
+            background-color: var(--error-bg);
+            color: #C0392B;
+        }
+
+        .ans-input:disabled, .ans-select:disabled {
+            opacity: 1;
+        }
+
+        .icon {
+            position: absolute;
+            right: 12px;
+            font-size: 20px;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        /* Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #E5E8E8;
+            z-index: 100;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background-color: #BDC3C7; cursor: not-allowed; }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-next { background-color: var(--primary); color: white; }
+
+        .nav-buttons {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        /* Summary Page */
+        .summary-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.1);
+        }
+
+        .student-name-display {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed #E5E8E8;
+            font-size: 18px;
+        }
+
+        .score-row:last-child {
+            border-bottom: none;
+            margin-top: 12px;
+            padding-top: 20px;
+            font-weight: 600;
+            font-size: 22px;
+            color: var(--primary);
+        }
+
+        /* Custom Select Arrow */
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 12px;
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div id="page1" class="page active">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <span style="font-size: 60px;">📚</span>
+            </div>
+            <h1>ยินดีต้อนรับ</h1>
+            <p class="subtitle">กรุณากรอกชื่อ-นามสกุล ก่อนเริ่มทำแบบฝึกหัด</p>
+            <div class="input-group">
+                <input type="text" id="studentName" class="name-input" placeholder="พิมพ์ชื่อของคุณที่นี่..." oninput="checkName()">
+            </div>
+        </div>
+        <div class="bottom-nav">
+            <button id="startBtn" class="btn-primary" disabled onclick="goToPage(2)">เริ่มทำแบบฝึกหัด</button>
+        </div>
+    </div>
+
+    <div id="page2" class="page">
+        <h2>แบบฝึกหัดที่ 1</h2>
+        <p class="subtitle">หาผลลบเติมในช่องว่างให้ถูกต้อง</p>
+        <div id="ex1-container"></div>
+        
+        <div class="bottom-nav">
+            <div class="nav-buttons">
+                <button class="btn-outline" onclick="goToPage(1)">ย้อนกลับ</button>
+                <button class="btn-next" onclick="goToPage(3)">หน้าถัดไป</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <h2>แบบฝึกหัดที่ 2</h2>
+        <p class="subtitle">เติมเครื่องหมาย > , < หรือ = ลงในช่องว่าง</p>
+        <div id="ex2-container"></div>
+        
+        <div class="bottom-nav">
+            <div class="nav-buttons">
+                <button class="btn-outline" onclick="goToPage(2)">ย้อนกลับ</button>
+                <button class="btn-next" onclick="goToSummary()">ส่งคำตอบ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page4" class="page">
+        <h2>สรุปผลคะแนน</h2>
+        <p class="subtitle">ผลการทำแบบฝึกหัดทั้งหมดของคุณ</p>
+        
+        <div class="summary-card" id="capture-area">
+            <div class="student-name-display" id="displayName">ชื่อ: </div>
+            
+            <div class="score-row">
+                <span>แบบฝึกหัดที่ 1</span>
+                <span id="scoreEx1">0 / 10</span>
+            </div>
+            <div class="score-row">
+                <span>แบบฝึกหัดที่ 2</span>
+                <span id="scoreEx2">0 / 10</span>
+            </div>
+            <div class="score-row">
+                <span>คะแนนรวมทั้งหมด</span>
+                <span id="totalScore">0 / 20</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; color: var(--text-light); font-size: 14px;">
+            <p>📸 สามารถแคปหน้าจอนี้เพื่อส่งคุณครูได้เลย</p>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="btn-primary" onclick="resetQuiz()">ทำใหม่อีกครั้ง</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Data ---
+    const ex1Data = [
+        { id: 1, q: "119,386 - 19,101 =", a: "100285" },
+        { id: 2, q: "38,689 - 9,000 =", a: "29689" },
+        { id: 3, q: "(2,400 - 90) - 467 =", a: "1843" },
+        { id: 4, q: "(8,000 - 666) - 4,800 =", a: "2534" },
+        { id: 5, q: "(379,678 - 38,500) - 99 =", a: "341079" },
+        { id: 6, q: "67,089 - (43,616 - 8,976) =", a: "32449" },
+        { id: 7, q: "535,448 - 36,240 - 5,600 =", a: "493608" },
+        { id: 8, q: "(932,645 - 19,669) - 85,609 =", a: "827367" },
+        { id: 9, q: "3,608,980 - (87,485 - 9,658) =", a: "3531153" },
+        { id: 10, q: "(346,586 - 98,916) - 999 =", a: "246671" }
+    ];
+
+    const ex2Data = [
+        { id: 1, q1: "8,630 - 3,400", q2: "8,520 - 3,400", a: ">" },
+        { id: 2, q1: "8,800 + 5,500", q2: "8,700 + 5,500", a: ">" },
+        { id: 3, q1: "65,408 - 895", q2: "58,463 + 6,050", a: "=" },
+        { id: 4, q1: "370,544 - 120,151", q2: "434,337 - 25,120", a: "<" },
+        { id: 5, q1: "379,678 - 38,500", q2: "37,089 - 32,515", a: ">" },
+        { id: 6, q1: "777,888 + 999,666", q2: "876,543 + 234,567", a: ">" },
+        { id: 7, q1: "628,534 + 91,766", q2: "999,999 - 89,699", a: "<" },
+        { id: 8, q1: "563,041 + 117,438", q2: "540,719 + 196,226", a: "<" },
+        { id: 9, q1: "6,735,000 + 67,658", q2: "8,005,108 - 999,675", a: "<" },
+        { id: 10, q1: "3,005,108 + 2,135,000", q2: "9,000,000 - 3,859,892", a: "=" }
+    ];
+
+    // --- State Variables ---
+    let scores = { ex1: 0, ex2: 0 };
+    let ex1Status = Array(10).fill(false);
+    let ex2Status = Array(10).fill(false);
+
+    // --- Initialization ---
+    window.onload = () => {
+        renderEx1();
+        renderEx2();
+    };
+
+    function checkName() {
+        const nameInput = document.getElementById("studentName").value.trim();
+        document.getElementById("startBtn").disabled = nameInput === "";
+    }
+
+    function goToPage(pageNum) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page${pageNum}`).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- Render Ex 1 ---
+    function renderEx1() {
+        const container = document.getElementById("ex1-container");
+        container.innerHTML = "";
+        
+        ex1Data.forEach((item, index) => {
+            const card = document.createElement("div");
+            card.className = "question-card";
+            card.innerHTML = `
+                <div class="q-text">${item.id}. ${item.q}</div>
+                <div class="answer-wrapper">
+                    <input type="text" inputmode="numeric" class="ans-input" id="ex1-ans-${index}" 
+                           placeholder="ใส่คำตอบ" oninput="checkEx1(${index}, '${item.a}')">
+                    <span class="icon" id="ex1-icon-${index}"></span>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // --- Render Ex 2 ---
+    function renderEx2() {
+        const container = document.getElementById("ex2-container");
+        container.innerHTML = "";
+        
+        ex2Data.forEach((item, index) => {
+            const card = document.createElement("div");
+            card.className = "question-card";
+            card.innerHTML = `
+                <div class="q-text" style="text-align:center;">${item.id}.</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <div style="flex:1; text-align:right; font-size:14px;">${item.q1}</div>
+                    <div class="answer-wrapper select-wrapper" style="flex: 0 0 70px;">
+                        <select class="ans-select" id="ex2-ans-${index}" onchange="checkEx2(${index}, '${item.a}')" style="padding-left: 10px; text-align:center;">
+                            <option value="">?</option>
+                            <option value=">">></option>
+                            <option value="<"><</option>
+                            <option value="=">=</option>
+                        </select>
+                        <span class="icon" id="ex2-icon-${index}" style="right:-25px;"></span>
+                    </div>
+                    <div style="flex:1; text-align:left; font-size:14px;">${item.q2}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // --- Logic Ex 1 ---
+    function checkEx1(index, correctAnswer) {
+        const inputEl = document.getElementById(`ex1-ans-${index}`);
+        const iconEl = document.getElementById(`ex1-icon-${index}`);
+        
+        const userInput = inputEl.value.replace(/[^0-9]/g, '');
+        
+        if (userInput.length === correctAnswer.length) {
+            if (userInput === correctAnswer) {
+                inputEl.classList.remove('error');
+                inputEl.classList.add('success');
+                inputEl.disabled = true;
+                iconEl.innerText = '✅';
+                if (!ex1Status[index]) {
+                    scores.ex1++;
+                    ex1Status[index] = true;
+                }
+            } else {
+                inputEl.classList.add('error');
+                iconEl.innerText = '❌';
+            }
+        } else {
+            inputEl.classList.remove('error', 'success');
+            iconEl.innerText = '';
+        }
+    }
+
+    // --- Logic Ex 2 ---
+    function checkEx2(index, correctAnswer) {
+        const selectEl = document.getElementById(`ex2-ans-${index}`);
+        const iconEl = document.getElementById(`ex2-icon-${index}`);
+        const userInput = selectEl.value;
+
+        if (userInput !== "") {
+            selectEl.disabled = true;
+            
+            if (userInput === correctAnswer) {
+                selectEl.classList.add('success');
+                iconEl.innerText = '✅';
+                if (!ex2Status[index]) {
+                    scores.ex2++;
+                    ex2Status[index] = true;
+                }
+            } else {
+                selectEl.classList.add('error');
+                iconEl.innerText = '❌';
+            }
+        }
+    }
+
+    // --- Summary ---
+    function goToSummary() {
+        const name = document.getElementById("studentName").value.trim() || "นักเรียน";
+        document.getElementById("displayName").innerText = `ชื่อ: ${name}`;
+        
+        document.getElementById("scoreEx1").innerText = `${scores.ex1} / 10`;
+        document.getElementById("scoreEx2").innerText = `${scores.ex2} / 10`;
+        
+        const total = scores.ex1 + scores.ex2;
+        document.getElementById("totalScore").innerText = `${total} / 20`;
+        
+        goToPage(4);
+    }
+
+    // --- Reset Quiz ---
+    function resetQuiz() {
+        // ล้างคะแนนและสถานะ
+        scores = { ex1: 0, ex2: 0 };
+        ex1Status = Array(10).fill(false);
+        ex2Status = Array(10).fill(false);
+        
+        // สั่งวาดฟอร์มใหม่ทั้งหมด (ช่องจะถูกล้างค่าและปลดล็อก)
+        renderEx1();
+        renderEx2();
+        
+        // พาผู้ใช้กลับไปที่หน้า 1
+        goToPage(1);
+    }
+</script>
+
+</body>
+</html>
