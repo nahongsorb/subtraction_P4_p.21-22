@@ -7,12 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #FF6B6B;      /* สีชมพูอมแดงสดใส */
-            --primary-dark: #D84343; /* เงาของปุ่ม */
-            --secondary: #4ECDC4;    /* สีเขียวมิ้นต์ */
+            --primary: #FF6B6B;      
+            --primary-dark: #D84343; 
+            --secondary: #4ECDC4;    
             --secondary-dark: #319C95;
-            --success: #A8E6CF;      /* สีเขียวพาสเทลเมื่อตอบถูก */
-            --error: #FFD3B6;        /* สีส้มพาสเทลเมื่อตอบผิด */
+            --success: #A8E6CF;      
+            --error: #FFD3B6;        
             --text-main: #4A4A4A;
             --card-bg: #FFFFFF;
             --app-bg: #F0F9FF;
@@ -20,13 +20,12 @@
 
         * {
             box-sizing: border-box;
-            font-family: 'Itim', cursive; /* ใช้ฟอนต์ Itim */
+            font-family: 'Itim', cursive;
             margin: 0;
             padding: 0;
         }
 
         body {
-            /* พื้นหลังลายจุดน่ารักๆ */
             background-color: var(--app-bg);
             background-image: 
                 radial-gradient(#BAE6FD 20%, transparent 20%), 
@@ -38,7 +37,7 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 10px; /* ให้มีขอบบนมือถือ */
+            padding: 10px; 
         }
 
         .app-container {
@@ -50,7 +49,6 @@
             flex-direction: column;
             position: relative;
             overflow: hidden;
-            /* ขอบมนและเงาสวยๆ */
             border-radius: 30px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             border: 4px solid #FFFFFF;
@@ -168,6 +166,49 @@
             font-size: 24px;
             pointer-events: none;
             transition: all 0.3s;
+        }
+
+        /* Feedback Boxes */
+        .feedback-text {
+            font-size: 16px;
+            color: var(--primary);
+            text-align: center;
+            margin-top: 5px;
+            width: 100%;
+        }
+        .feedback-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .digit-box {
+            width: 32px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 8px;
+            font-family: 'Itim', cursive;
+            animation: popIn 0.3s ease forwards;
+        }
+        .digit-box.correct {
+            background: var(--success);
+            color: #1B5E20;
+            border: 2px solid #4CAF50;
+        }
+        .digit-box.incorrect {
+            background: var(--error);
+            color: #B71C1C;
+            border: 2px solid #F44336;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         /* Navigation Bar */
@@ -298,6 +339,12 @@
             pointer-events: none;
         }
 
+        /* อนิเมชั่นดาวเด้งๆ หน้าแรก */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
     </style>
 </head>
 <body>
@@ -310,9 +357,9 @@
                 <span style="font-size: 80px; display: inline-block; animation: bounce 2s infinite;">🌟</span>
             </div>
             <h1>ยินดีต้อนรับคนเก่ง!</h1>
-            <p class="subtitle">พิมพ์ชื่อของหนูลงในช่องด้านล่างเลยจ้า 📝</p>
+            <p class="subtitle">พิมพ์ชื่อเล่นของหนูลงในช่องด้านล่างเลยจ้า 📝</p>
             <div class="input-group">
-                <input type="text" id="studentName" class="name-input" placeholder="ชื่อ-นามสกุล..." oninput="checkName()">
+                <input type="text" id="studentName" class="name-input" placeholder="ใส่ชื่อเล่นตรงนี้เลย..." oninput="checkName()">
             </div>
         </div>
         <div class="bottom-nav">
@@ -377,14 +424,6 @@
     </div>
 
 </div>
-
-<style>
-    /* อนิเมชั่นดาวเด้งๆ หน้าแรก */
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-    }
-</style>
 
 <script>
     // --- Data ---
@@ -451,6 +490,7 @@
                            placeholder="ตอบตรงนี้นะ..." oninput="checkEx1(${index}, '${item.a}')">
                     <span class="icon" id="ex1-icon-${index}"></span>
                 </div>
+                <div id="ex1-feedback-${index}"></div>
             `;
             container.appendChild(card);
         });
@@ -488,16 +528,19 @@
     function checkEx1(index, correctAnswer) {
         const inputEl = document.getElementById(`ex1-ans-${index}`);
         const iconEl = document.getElementById(`ex1-icon-${index}`);
+        const feedbackEl = document.getElementById(`ex1-feedback-${index}`);
         
         inputEl.value = inputEl.value.replace(/[^0-9,]/g, '');
         const userInput = inputEl.value.replace(/,/g, '');
         
+        // เมื่อใส่เลขครบตามจำนวนหลักของคำตอบแล้ว
         if (userInput.length === correctAnswer.length) {
             if (userInput === correctAnswer) {
                 inputEl.classList.remove('error');
                 inputEl.classList.add('success');
                 inputEl.disabled = true;
                 iconEl.innerText = '✅';
+                feedbackEl.innerHTML = ''; // ถ้าถูกให้ซ่อนตัวเช็ค
                 if (!ex1Status[index]) {
                     scores.ex1++;
                     ex1Status[index] = true;
@@ -505,10 +548,26 @@
             } else {
                 inputEl.classList.add('error');
                 iconEl.innerText = '❌';
+                
+                // สร้างกล่องแสดงแต่ละหลักเพื่อเทียบว่าหลักไหนถูกหรือผิด
+                let feedbackHTML = '<div class="feedback-text">ลองเช็คดูใหม่นะว่าหลักไหนผิด 👇</div>';
+                feedbackHTML += '<div class="feedback-container">';
+                for (let i = 0; i < userInput.length; i++) {
+                    // เทียบเลขทีละหลัก
+                    if (userInput[i] === correctAnswer[i]) {
+                        feedbackHTML += `<div class="digit-box correct">${userInput[i]}</div>`;
+                    } else {
+                        feedbackHTML += `<div class="digit-box incorrect">${userInput[i]}</div>`;
+                    }
+                }
+                feedbackHTML += '</div>';
+                feedbackEl.innerHTML = feedbackHTML;
             }
         } else {
+            // ถ้าลบออกหรือใส่ไม่ครบ จะล้างผลการเช็คออก
             inputEl.classList.remove('error', 'success');
             iconEl.innerText = '';
+            feedbackEl.innerHTML = '';
         }
     }
 
